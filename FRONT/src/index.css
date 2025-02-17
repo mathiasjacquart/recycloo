@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --font-inter: Inter, sans-serif;
+  --color-primary : #ffff;
+  --color-secondary: #023D29;
+  --color-tertiary: #231F1E;
+}
+
+.nav-burger-button{
+  border-radius: 8px;
+  width: 200px;
+  border: 1px #023D29 solid ;
+  padding: 5px 8px ;
+  margin: 9px 0px;
+}
+
+a { 
+  cursor: pointer;
+}
