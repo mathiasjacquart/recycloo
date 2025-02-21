@@ -1,5 +1,6 @@
 import express from "express";
 import { signupUser } from "../controllers/users-controllers";
+import { verifyMail } from "../controllers/users-controllers";
 import { validateSignUp } from "../middleware/users-middleware";
 const router = express.Router();
 
@@ -8,7 +9,7 @@ const router = express.Router();
 router.post("/signup", validateSignUp ,signupUser )
 // router.post("/signin", signinUser)
 // router.post("/forgotten-password", forgottenPassword)
-// router.get("/verifyMail/:token", verifyMail);
+router.get("/verifyMail/:token", verifyMail);
 // router.get("/resetPassword/:token" , verifyResetPassword)
 // router.put("/resetPassword/:id", resetPassword)
 

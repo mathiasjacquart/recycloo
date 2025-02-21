@@ -40,3 +40,24 @@ a {
 .border-radius-8{
   border-radius: 8px;
 }
+
+button {
+  padding: 7px 14px;
+  background-color: #023D29;
+  border-radius: 5px;
+  margin: 8px 0px;
+  color: white;
+  transition: all ease-in-out 1s;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover{
+  background-color: #034f35fa;
+}
+
+.error-warning {
+  color: rgb(125, 0, 0);
+  font-size: 14px;
+  font-weight: 00;
+}

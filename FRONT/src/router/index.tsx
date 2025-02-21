@@ -2,6 +2,7 @@ import { createBrowserRouter, Route, createRoutesFromElements } from "react-rout
 import App from "../App";
 import Signin from "../pages/auth/Signin";
 import Homepage from "../pages/homepage/Homepage";
+import Signup from "../pages/auth/Signup";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -10,6 +11,11 @@ export const router = createBrowserRouter(
             <Route
             path="sign-in"
             element={<Signin/>}
+
+            />
+            <Route
+            path="sign-up"
+            element={<Signup/>}
 
             />
         </Route>

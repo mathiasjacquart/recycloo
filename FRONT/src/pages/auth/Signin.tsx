@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 
 function Signin() {
   const [email, setEmail] = useState('')
@@ -23,7 +24,7 @@ function Signin() {
                 </form>
                 <div className="flex flex-col items-center">
                   <a href="">Mot de passe oublié ? </a>
-                  <a href="">Inscris-toi ici</a>
+                  <Link to="/sign-up">Inscris-toi ici</Link>
                 </div>
             </div>
     </div>

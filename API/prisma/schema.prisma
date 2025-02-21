@@ -16,6 +16,8 @@ model User {
   role      Role     @default(CLIENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  token     String?
+  isVerified Boolean @default(false)
   orders    Order[]
   reviews   Review[]
 }
