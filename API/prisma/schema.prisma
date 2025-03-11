@@ -18,6 +18,7 @@ model User {
   updatedAt DateTime @updatedAt
   token     String?
   isVerified Boolean @default(false)
+  isConnected Boolean @default(false)
   orders    Order[]
   reviews   Review[]
 }

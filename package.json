@@ -1,0 +1,22 @@
+{
+  "name": "recycloo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:API\" \"npm run dev:FRONT\"",
+    "dev:API": "cd API && npm run dev",
+    "dev:FRONT": "cd FRONT && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mathiasjacquart/recycloo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mathiasjacquart/recycloo/issues"
+  },
+  "homepage": "https://github.com/mathiasjacquart/recycloo#readme",
+  "description": ""
+}
