@@ -132,20 +132,26 @@ export const signInUser = async (req: Request, res: Response) => {
       where: { email },
     });
     if (user) {
-      if (user.isVerified) {
-        const match = await bcrypt.compare(password, user.password);
-        if (match) {
-          const token = createTokenLogin(user.id);
-          res.status(200).json({ user, token });
+      if (user.role === "CLIENT") {
+        if (user.isVerified) {
+          const match = await bcrypt.compare(password, user.password);
+          if (match) {
+            const token = createTokenLogin(user.id);
+            res.status(200).json({ user, token });
+          } else {
+            res.status(400).json({
+              message: "Mauvaise adresse e-mail ou mot de passe",
+            });
+          }
         } else {
           res
             .status(400)
-            .json({ message: "Mauvaise adresse e-mail ou mot de passe" });
+            .json({ message: "Vous n'avez pas validé votre compte" });
         }
       } else {
         res
           .status(400)
-          .json({ message: "Vous n'avez pas validé votre compte" });
+          .json({ message: "Mauvaise adresse e-mail ou mot de passe" });
       }
     } else {
       res

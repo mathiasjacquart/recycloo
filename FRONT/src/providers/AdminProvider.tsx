@@ -1,43 +1,43 @@
 import React, { ReactNode, useEffect, useState } from "react";
-import { UserContext } from "../context/UserContext";
+import { AdminContext } from "../context/Admincontext";
 import { useNavigate } from "react-router-dom";
 
-interface User {
+interface Admin {
   id: string;
   email: string;
   token?: string;
 }
 
-interface UserProviderProps {
+interface AdminProviderProps {
   children: ReactNode;
 }
 
-function UserProvider({ children }: UserProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
+function AdminProvider({ children }: AdminProviderProps) {
+  const [admin, setAdmin] = useState<Admin | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Récupérer les données du localStorage
-    const userStorage = localStorage.getItem("user");
+    const adminStorage = localStorage.getItem("admin");
 
-    if (userStorage) {
+    if (adminStorage) {
       try {
         // Analyser les données stockées
-        const parsedStorage = JSON.parse(userStorage);
+        const parsedStorage = JSON.parse(adminStorage);
 
-        // Vérifier si nous avons un objet avec user et token
-        if (parsedStorage && parsedStorage.user && parsedStorage.token) {
+        // Vérifier si nous avons un objet avec admin et token
+        if (parsedStorage && parsedStorage.admin && parsedStorage.token) {
           // Vérifier si le token est valide
           if (isTokenValid(parsedStorage.token)) {
             // Définir l'utilisateur avec son token
-            const userWithToken = {
-              ...parsedStorage.user,
+            const adminWithToken = {
+              ...parsedStorage.admin,
               token: parsedStorage.token,
             };
-            setUser(userWithToken);
-            console.log(user);
+            setAdmin(adminWithToken);
+            console.log(admin);
           } else {
-            logoutConnectedUser();
+            logoutConnectedAdmin();
           }
         } else {
           console.warn(
@@ -49,36 +49,34 @@ function UserProvider({ children }: UserProviderProps) {
           "Erreur lors de l'analyse des données utilisateur:",
           error
         );
-        logoutConnectedUser();
+        logoutConnectedAdmin();
       }
     }
   }, []);
-
-  function logoutConnectedUser() {
-    localStorage.removeItem("user");
-    setUser(null);
+  function logoutConnectedAdmin() {
+    localStorage.removeItem("admin");
+    setAdmin(null);
     navigate("/");
   }
-
-  function setConnectedUser(userConnected: User) {
-    if (userConnected) {
+  function setConnectedAdmin(adminConnected: Admin) {
+    if (adminConnected) {
       // S'assurer que l'utilisateur a un token
-      if (!userConnected.token) {
+      if (!adminConnected.token) {
         console.warn("Tentative de définir un utilisateur sans token");
         return;
       }
 
-      const userData = {
-        user: userConnected,
-        token: userConnected.token,
+      const adminData = {
+        admin: adminConnected,
+        token: adminConnected.token,
       };
 
       // Enregistrer dans localStorage d'abord
-      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("admin", JSON.stringify(adminData));
 
       // Puis mettre à jour l'état
-      setUser(userConnected);
-      console.log(user);
+      setAdmin(adminConnected);
+      console.log(admin);
     }
   }
 
@@ -93,17 +91,17 @@ function UserProvider({ children }: UserProviderProps) {
   }
 
   return (
-    <UserContext.Provider
+    <AdminContext.Provider
       value={{
-        user,
-        setConnectedUser,
-        logoutConnectedUser,
-        setUser,
+        admin,
+        setConnectedAdmin,
+        logoutConnectedAdmin,
+        setAdmin,
       }}
     >
       {children}
-    </UserContext.Provider>
+    </AdminContext.Provider>
   );
 }
 
-export default UserProvider;
+export default AdminProvider;

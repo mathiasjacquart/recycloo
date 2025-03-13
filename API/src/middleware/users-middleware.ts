@@ -58,3 +58,26 @@ export const validateSignIn = (
     return;
   }
 };
+export const validateAdminSignIn = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  try {
+    const result = userSchema.safeParse(req.body);
+    if (result)
+      if (!result.success) {
+        res.status(400).json({ errors: result.error.errors });
+        return;
+      }
+    if (result.data.role !== "ADMIN") {
+      res.status(403).json({ error: "Accès refusé, administrateur requis" });
+      return;
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({ error: "Erreur interne du serveur" });
+    return;
+  }
+};

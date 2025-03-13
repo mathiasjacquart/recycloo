@@ -5,8 +5,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signin } from "../../services/users";
 import { UserContext } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 function Signin() {
+  const navigate = useNavigate();
   const userContext = useContext(UserContext);
   if (!userContext) {
     throw new Error("UserContext must be used within a UserProvider");
@@ -37,21 +39,41 @@ function Signin() {
 
   const onSubmit = async (data: UserFormData) => {
     try {
-      console.log(data);
-      const response = await signin(data); // Si ça échoue, on va directement dans le catch
+      const response = await signin(data);
 
       // Vérification si response contient une erreur côté backend
       if (response.data?.message) {
-        setFeedback(response.data.message); // Affiche le message d'erreur du backend
-        return; // Stoppe l'exécution ici
+        setFeedback(response.data.message);
+        return;
       }
 
-      // Si pas d'erreur, on stocke l'utilisateur et on reset le formulaire
-      localStorage.setItem("user", JSON.stringify(response));
-      setConnectedUser(response.user);
-      reset();
+      // Si votre API retourne l'utilisateur sous forme de response.user
+      // et le token sous forme de response.token
+      if (response.user && response.token) {
+        // Ajouter le token à l'objet utilisateur
+        const userWithToken = {
+          ...response.user,
+          token: response.token,
+        };
 
-      console.log(response);
+        // Mettre à jour le contexte utilisateur
+        setConnectedUser(userWithToken);
+        reset();
+        navigate("/profile"); // Rediriger vers la page d'accueil après connexion
+      }
+      // Si votre API retourne autre chose, adaptez ce code
+      else if (response.token) {
+        // Si l'API retourne l'utilisateur et le token différemment
+        const userWithToken = {
+          ...response,
+          token: response.token,
+        };
+        setConnectedUser(userWithToken);
+        reset();
+        navigate("");
+      } else {
+        setFeedback("Format de réponse API non reconnu");
+      }
     } catch (error: any) {
       // Vérifie si c'est une erreur Axios et si le backend a renvoyé un message d'erreur
       if (error.response && error.response.data) {
@@ -59,15 +81,13 @@ function Signin() {
           "Erreur lors de la connexion :",
           error.response.data.message
         );
-        setFeedback(error.response.data.message); // Affiche l'erreur du backend
+        setFeedback(error.response.data.message);
       } else {
         console.error("Erreur inattendue :", error.message);
         setFeedback("Une erreur inattendue s'est produite.");
       }
     }
   };
-
-  console.log(feedback);
   return (
     <div className="container flex items-center justify-center mx-auto min-h-90">
       <div className="border border-gray-300 border-radius-8 flex-col flex justify-center items-center p-20 shadow ">
