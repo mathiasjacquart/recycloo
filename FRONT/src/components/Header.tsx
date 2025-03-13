@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import logo from "../assets/images/logo.svg";
 import { Link } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 function Header() {
   const [toggleNav, setToggleNav] = useState(false);
+  const [toggleAccountMenu, setToggleAccountMenu] = useState(false);
+  const userContext = useContext(UserContext);
+  if (!userContext) {
+    throw new Error("No userContext");
+  }
+  const { user } = userContext;
+  const { logoutConnectedUser } = userContext;
 
   const handleButtonNav = () => {
     const menu = document.getElementById("burgerMenu");
@@ -17,6 +25,9 @@ function Header() {
     }
   };
 
+  const handleButtonAccountMenu = () => {
+    setToggleAccountMenu(!toggleAccountMenu);
+  };
   return (
     <header className="">
       <div className="bg-secondary ">
@@ -30,11 +41,7 @@ function Header() {
       <div className="shadow w-full relative z-10">
         <div className="container  mx-auto flex items-center justify-between lg:justify-normal lg:flex-row p-4">
           <div className="lg:mr-10">
-            <img
-              className=""
-              src={logo}
-              alt="logo Recycloo"
-            />
+            <img className="" src={logo} alt="logo Recycloo" />
           </div>
           <div className="hidden lg:w-full lg:flex lg:flex-row lg:justify-between items-center">
             <div>
@@ -74,24 +81,75 @@ function Header() {
             </div>
             <div>
               <ul className="flex flex-row font-inter text-tertiary font-medium">
-                <li className="px-5 flex flex-row font-semibold hover:text-zinc-400 transition-all ease-in duration-200">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="size-6 mr-2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-                    />
-                  </svg>
+                {!user ? (
+                  <li className="px-5 flex flex-row font-semibold hover:text-zinc-400 transition-all ease-in duration-200">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      className="size-6 mr-2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                      />
+                    </svg>
 
-                  <Link to="/sign-in">Compte</Link>
-                </li>
+                    <Link to="/sign-in">Compte</Link>
+                  </li>
+                ) : (
+                  <li
+                    onClick={handleButtonAccountMenu}
+                    className="px-5 flex flex-row "
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      className="size-6 mr-2 hover:text-zinc-400 transition-all ease-in duration-200"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                      />
+                    </svg>
+
+                    <div className="relative font-semibold hover:text-zinc-400 transition-all ease-in duration-200 ">
+                      Compte
+                    </div>
+                    {toggleAccountMenu && (
+                      <div className="absolute border bg-white border-gray-400 rounded-2xl shadow top-14 z-20 ">
+                        <ul
+                          className="flex flex-col pt-2.5 px-1.5 font-inter font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <li className="py-0.5 px-1 cursor-pointer hover:text-zinc-400 transition-all ease-in duration-200">
+                            Profil
+                          </li>
+                          <li className="py-0.5 px-1 cursor-pointer hover:text-zinc-400 transition-all ease-in duration-200">
+                            Préférences
+                          </li>
+                          <li className="py-0.5 px-1 cursor-pointer hover:text-zinc-400 transition-all ease-in duration-200">
+                            Commandes
+                          </li>
+                          <li
+                            className="py-0.5 px-1 cursor-pointer hover:text-zinc-400 transition-all ease-in duration-200"
+                            onClick={logoutConnectedUser}
+                          >
+                            Déconnexion
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </li>
+                )}
+
                 <li className="px-5 flex flex-row font-semibold hover:text-zinc-400 transition-all ease-in duration-200">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -112,10 +170,7 @@ function Header() {
               </ul>
             </div>
           </div>
-          <button
-            className="lg:hidden"
-            onClick={handleButtonNav}
-          >
+          <button className="lg:hidden" onClick={handleButtonNav}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -160,18 +215,10 @@ function Header() {
         <hr className="w-32 mx-auto text-secondary mt-2 mb-2" />
 
         <ul className=" flex flex-col items-center text-secondary font-semibold font-inter">
-          <li className="nav-burger-button text-center">
-            Accueil
-          </li>
-          <li className="nav-burger-button text-center">
-            Catalogues
-          </li>
-          <li className="nav-burger-button text-center">
-            azeazezae
-          </li>
-          <li className="nav-burger-button text-center">
-            azeazezae
-          </li>
+          <li className="nav-burger-button text-center">Accueil</li>
+          <li className="nav-burger-button text-center">Catalogues</li>
+          <li className="nav-burger-button text-center">azeazezae</li>
+          <li className="nav-burger-button text-center">azeazezae</li>
         </ul>
         <hr className="w-32 mx-auto text-secondary mt-2 mb-2" />
         <ul className="flex flex-col items-center text-secondary font-semibold font-inter">

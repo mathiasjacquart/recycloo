@@ -7,8 +7,15 @@ import { signin } from "../../services/users";
 import { UserContext } from "../../context/UserContext";
 
 function Signin() {
-  const { setConnectedUser } = useContext(UserContext);
+  const userContext = useContext(UserContext);
+  if (!userContext) {
+    throw new Error("UserContext must be used within a UserProvider");
+  }
+  const { setConnectedUser, user } = userContext;
+  console.log(user);
+
   const [seePassword, setSeePassword] = useState(false);
+  const [feedback, setFeedback] = useState("");
   const handleSeePassword = () => {
     setSeePassword(!seePassword);
   };
@@ -22,6 +29,7 @@ function Signin() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(userSchemaSignIn),
@@ -30,16 +38,36 @@ function Signin() {
   const onSubmit = async (data: UserFormData) => {
     try {
       console.log(data);
-      const response = await signin(data);
-      if (!response.message) {
-        localStorage.setItem("user", JSON.stringify(response));
-        setConnectedUser(response.user);
+      const response = await signin(data); // Si ça échoue, on va directement dans le catch
+
+      // Vérification si response contient une erreur côté backend
+      if (response.data?.message) {
+        setFeedback(response.data.message); // Affiche le message d'erreur du backend
+        return; // Stoppe l'exécution ici
       }
+
+      // Si pas d'erreur, on stocke l'utilisateur et on reset le formulaire
+      localStorage.setItem("user", JSON.stringify(response));
+      setConnectedUser(response.user);
+      reset();
+
       console.log(response);
-    } catch (error) {
-      console.error("Erreur lors de la connexion", error);
+    } catch (error: any) {
+      // Vérifie si c'est une erreur Axios et si le backend a renvoyé un message d'erreur
+      if (error.response && error.response.data) {
+        console.error(
+          "Erreur lors de la connexion :",
+          error.response.data.message
+        );
+        setFeedback(error.response.data.message); // Affiche l'erreur du backend
+      } else {
+        console.error("Erreur inattendue :", error.message);
+        setFeedback("Une erreur inattendue s'est produite.");
+      }
     }
   };
+
+  console.log(feedback);
   return (
     <div className="container flex items-center justify-center mx-auto min-h-90">
       <div className="border border-gray-300 border-radius-8 flex-col flex justify-center items-center p-20 shadow ">
@@ -114,6 +142,7 @@ function Signin() {
             )}
           </div>
           <button type="submit">Se connecter</button>
+          {feedback && <p className="text-red-500">{feedback} </p>}
         </form>
         <div className="flex flex-col items-center">
           <a href="">Mot de passe oublié ? </a>

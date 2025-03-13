@@ -18,14 +18,37 @@ function UserProvider({ children }: UserProviderProps) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Récupérer les données du localStorage
     const userStorage = localStorage.getItem("user");
-    const parsedUser = userStorage ? JSON.parse(userStorage) : null;
 
-    if (parsedUser) {
-      const { token, user } = parsedUser;
-      if (token && isTokenValid(token)) {
-        setUser(user);
-      } else {
+    if (userStorage) {
+      try {
+        // Analyser les données stockées
+        const parsedStorage = JSON.parse(userStorage);
+
+        // Vérifier si nous avons un objet avec user et token
+        if (parsedStorage && parsedStorage.user && parsedStorage.token) {
+          // Vérifier si le token est valide
+          if (isTokenValid(parsedStorage.token)) {
+            // Définir l'utilisateur avec son token
+            const userWithToken = {
+              ...parsedStorage.user,
+              token: parsedStorage.token,
+            };
+            setUser(userWithToken);
+          } else {
+            logoutConnectedUser();
+          }
+        } else {
+          console.warn(
+            "Format de données utilisateur invalide dans localStorage"
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de l'analyse des données utilisateur:",
+          error
+        );
         logoutConnectedUser();
       }
     }
@@ -39,7 +62,17 @@ function UserProvider({ children }: UserProviderProps) {
 
   function setConnectedUser(userConnected: User) {
     if (userConnected) {
+      // S'assurer que l'utilisateur a un token
+      if (!userConnected.token) {
+        console.warn("Tentative de définir un utilisateur sans token");
+        return;
+      }
+
+      // Mettre à jour l'état
       setUser(userConnected);
+      console.log(user);
+
+      // Enregistrer dans localStorage
       localStorage.setItem(
         "user",
         JSON.stringify({ user: userConnected, token: userConnected.token })
@@ -52,7 +85,7 @@ function UserProvider({ children }: UserProviderProps) {
       const decodedToken = JSON.parse(atob(token.split(".")[1]));
       return decodedToken.exp * 1000 > new Date().getTime();
     } catch (error) {
-      console.error(error);
+      console.error("Erreur lors de la validation du token:", error);
       return false;
     }
   }
